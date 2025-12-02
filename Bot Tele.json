@@ -1,0 +1,636 @@
+{
+  "name": "Bot Tele",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Kamu adalah Bot AI yang membantu orang banyak dan berguna untuk semua orang, Jawab pertanyaan dari pengguna dengan data yang ada dan jelaskan secara rinci. Dan jangan lupa kasih emoji biar sesuai dengan suasananya.\n\nBerikut adalah riwayat percakapan:\n{{ $json[\"history\"] }}\n\nJawablah pertanyaan berikut secara singkat, sopan, dan sesuai konteks.",
+        "options": {
+          "systemMessage": "kamu adalah bot AI yang berguna dan membantu banyak orang, jawab pertanyaan pengguna secara detail sesuai data yang ada. dan gunakan bahasa indonesia yang baik dan sopan.\n\n{{ $('Telegram Trigger').item.json.message.text }}\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        880,
+        120
+      ],
+      "id": "885a523c-b2f3-4829-aa1a-610ae6e09987",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1180,
+        -40
+      ],
+      "id": "51e4adff-713a-40bd-aaf9-67492881a03e",
+      "name": "Telegram Trigger",
+      "webhookId": "710ea4b5-d40b-43c9-ba80-f925aa19b1bb",
+      "credentials": {
+        "telegramApi": {
+          "id": "ACk4FkOpjNmPdnm0",
+          "name": "Telegram miayam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.answer }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1800,
+        340
+      ],
+      "id": "ddf8f57c-9e16-4b35-8240-29cf74a42eac",
+      "name": "Send a text message",
+      "webhookId": "b8474895-2857-417e-93d3-f8ebd3fa47ef",
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "notesInFlow": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "ACk4FkOpjNmPdnm0",
+          "name": "Telegram miayam"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "76ded695-ac7f-4be4-855d-c472457b5cda",
+              "leftValue": "={{ $json.isTooLong }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "b1e5e0c0-7b03-4a10-b9b5-02611564c201",
+              "leftValue": "={{ $json.answer }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1560,
+        120
+      ],
+      "id": "2540ac19-ca57-4d81-ac2b-ac05c3709b86",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "Maaf ya jawabannya terlalu panjang :< coba ulangi soalnya dan tambahin \"singkatkan\" biar bisa!!",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1800,
+        -120
+      ],
+      "id": "df13e42e-dd7d-4eba-bc7f-430f4bfceba6",
+      "name": "Send a text message1",
+      "webhookId": "3afac839-f1da-4a50-9167-1eea9060c6e7",
+      "credentials": {
+        "telegramApi": {
+          "id": "ACk4FkOpjNmPdnm0",
+          "name": "Telegram miayam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $json.chat_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        120,
+        120
+      ],
+      "id": "a00f7f15-d52a-4fd9-bd2c-3623e1930a56",
+      "name": "Send a chat action",
+      "webhookId": "48471171-157e-448a-9fe7-ae9f9570d292",
+      "credentials": {
+        "telegramApi": {
+          "id": "ACk4FkOpjNmPdnm0",
+          "name": "Telegram miayam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "60664d46-00b7-41e2-a2ea-e7787c7247e3",
+              "name": "chat_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -780,
+        -40
+      ],
+      "id": "9cb9285e-75ff-4cb7-92ee-230d8a0af76e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = ($('Telegram Trigger').first().json.message.text|| \"\").toLowerCase();\nconst isTimeQuestionKeywords = [\"jam\", \"tanggal\", \"hari\", \"tahun\"];\nconst isAskingTime = isTimeQuestionKeywords.some(kata => msg.includes(kata));\n\nreturn [\n  {\n    json: {\n      isTimeQuestion: isAskingTime, // Ini hasilnya Boolean asli\n      message: msg,\n      chat_id: $('Telegram Trigger').first().json.message.chat.id\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        -40
+      ],
+      "id": "d524181d-f599-4c67-beb9-cc244c98078e",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bb18acc9-e5e8-47c0-a208-177889e831e7",
+              "leftValue": "={{ $json.isTimeQuestion.toBoolean() }}",
+              "rightValue": "jam",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -340,
+        -40
+      ],
+      "id": "fd05dd2c-60e8-460e-9bf3-05531bae3ee9",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Telegram Trigger').first().json.message.text.toLowerCase();\nconst now = new Date();\n\n// Daftar zona waktu berdasarkan nama negara dalam Bahasa Indonesia\nconst zonaWaktu = {\n  indonesia: \"Asia/Jakarta\",\n  jepang: \"Asia/Tokyo\",\n  amerika: \"America/New_York\",\n  kanada: \"America/Toronto\",\n  australia: \"Australia/Sydney\",\n  inggris: \"Europe/London\",\n  prancis: \"Europe/Paris\",\n  jerman: \"Europe/Berlin\",\n  italia: \"Europe/Rome\",\n  brazil: \"America/Sao_Paulo\",\n  india: \"Asia/Kolkata\",\n  cina: \"Asia/Shanghai\",\n  korea: \"Asia/Seoul\",\n  thailand: \"Asia/Bangkok\",\n  afrika: \"Africa/Johannesburg\",\n  mesir: \"Africa/Cairo\",\n  rusia: \"Europe/Moscow\",\n  uae: \"Asia/Dubai\",\n  arab: \"Asia/Riyadh\",\n  filipina: \"Asia/Manila\",\n  vietnam: \"Asia/Ho_Chi_Minh\",\n  malaysia: \"Asia/Kuala_Lumpur\",\n  pakistan: \"Asia/Karachi\",\n  bangladesh: \"Asia/Dhaka\"\n};\n\n// Cari negara yang disebut dalam input\nlet negaraDitemukan = null;\nfor (const negara in zonaWaktu) {\n  if (input.includes(negara)) {\n    negaraDitemukan = negara;\n    break;\n  }\n}\n\n// Default ke Indonesia kalau gak ketemu\nconst negara = negaraDitemukan || \"indonesia\";\nconst zona = zonaWaktu[negara];\n\nconst format = new Intl.DateTimeFormat('id-ID', {\n  timeZone: zona,\n  weekday: 'long',\n  year: 'numeric',\n  month: 'long',\n  day: 'numeric',\n  hour: '2-digit',\n  minute: '2-digit',\n  second: '2-digit'\n});\n\nconst hasil = format.format(now);\n\nreturn [{\n  json: {\n    reply: `Waktu di ${negara.charAt(0).toUpperCase() + negara.slice(1)} sekarang ${hasil}`\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        -220
+      ],
+      "id": "8563a0a0-78f2-4260-9ad7-09c5fe00a818",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.reply }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        -220
+      ],
+      "id": "0f787373-e139-41bc-8749-986f767e95ab",
+      "name": "Send a text message2",
+      "webhookId": "4f6d301b-2ea5-4ce4-a097-61d30d481cdb",
+      "credentials": {
+        "telegramApi": {
+          "id": "ACk4FkOpjNmPdnm0",
+          "name": "Telegram miayam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $json.chat_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -100,
+        -220
+      ],
+      "id": "287bb8d6-6eca-498f-a02a-8accc84c857a",
+      "name": "Send a chat action1",
+      "webhookId": "48471171-157e-448a-9fe7-ae9f9570d292",
+      "credentials": {
+        "telegramApi": {
+          "id": "ACk4FkOpjNmPdnm0",
+          "name": "Telegram miayam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        800,
+        320
+      ],
+      "id": "b32aaba8-d7f3-4c48-8bff-8174bffdac7a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "qBrHnF8ECHBpj8J0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO chat_history (chat_id, username, role, message)\nVALUES ({{$json[\"message\"][\"from\"][\"id\"]}}, '{{ $json.message.from.first_name }}', 'user', '{{$json[\"message\"][\"text\"]}}');",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -980,
+        -40
+      ],
+      "id": "3c5262c7-32c9-49f5-9fce-1e21d1e4220b",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "mySql": {
+          "id": "cLKdjmQfY5xrmdnG",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT role, message\nFROM chat_history\nWHERE chat_id = {{ $('Edit Fields1').item.json.chat_id }}\nORDER BY id DESC\nLIMIT 10;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        360,
+        120
+      ],
+      "id": "6597faa9-08bc-4081-bcf0-01a06f3422a2",
+      "name": "Execute a SQL query1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "mySql": {
+          "id": "cLKdjmQfY5xrmdnG",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ambil data dari MySQL Node\nconst rows = items;\n\n// Ubah urutannya dari yang lama ke yang baru\nrows.reverse();\n\n// Gabungkan jadi satu string\nlet conversationHistory = rows.map(row => {\n  return `${row.json.role}: ${row.json.message}`;\n}).join(\"\\n\");\n\nreturn [{\n  json: {\n    history: conversationHistory\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        120
+      ],
+      "id": "d70857ec-2209-4136-bbce-e4fd423c97b5",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        340
+      ],
+      "id": "4217dafc-0569-4ded-a805-98785b54df60",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "Aifh4GWXibufwwYP",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "60664d46-00b7-41e2-a2ea-e7787c7247e3",
+              "name": "chat_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -120,
+        120
+      ],
+      "id": "4f41b26d-7a1f-4641-b9c4-dd1e2edd5ec7",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const answer =  $input.first().json.output || \"\";\nconst isTooLong = (answer.length > 4096).toString();\n\nconsole.log(\"answer length:\", answer.length);\nconsole.log(\"isTooLong:\", isTooLong);\n\nreturn [{\n  answer,\n  isTooLong,\n  chat_id: $('Telegram Trigger').first().json.message.from.id || null\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        120
+      ],
+      "id": "36c83f0d-1a60-4592-b040-61dc2ded42ac",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a chat action": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a chat action1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a chat action1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message2": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Send a chat action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0a693122-a7c4-4da9-a7af-35e63f85d01d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9cf6fa13cb631a12cbdab2d9e5acc91f84719091a8dd920f6a5609977d55eb50"
+  },
+  "id": "yzWC6d5B5eU1ifSa",
+  "tags": []
+}

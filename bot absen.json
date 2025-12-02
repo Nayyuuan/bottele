@@ -1,0 +1,723 @@
+{
+  "name": "bot absen",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[2].file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        20
+      ],
+      "id": "9329f5ad-97ed-4f03-a94e-5c15b62289d8",
+      "name": "Get a file",
+      "webhookId": "8ee2daae-48c5-4f08-9d71-5f9f3cbb81e1",
+      "credentials": {
+        "telegramApi": {
+          "id": "exJCp5QeFaidpDVz",
+          "name": "bot absensi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api-us.faceplusplus.com/facepp/v3/detect",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "OR1qS5TGbKlmtD3egPoFUlhg1Ghydlwh"
+            },
+            {
+              "name": "api_secret",
+              "value": "Mg7YCUsw1uni1HYea1-D3tBM5m8Vo0GG"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "image_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1800,
+        20
+      ],
+      "id": "9bde9bcf-ad12-4911-891c-d5fcc28d3e94",
+      "name": "HTTP Request",
+      "retryOnFail": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7bb41b5a-1dfe-4152-a722-9d678cc3ce49",
+              "leftValue": "={{ $json.face_num }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2000,
+        20
+      ],
+      "id": "0a1d6c21-d4bb-49b3-8828-7ae24a7d9fd3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02ab755a-07a4-4eb5-ac5b-0e1b94e1dc5e",
+              "name": "chat_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+              "type": "string"
+            },
+            {
+              "id": "58537eb4-e634-4fc9-9a9b-f91ef359b906",
+              "name": "username",
+              "value": "={{ $('Telegram Trigger').item.json.message.from.username }}",
+              "type": "string"
+            },
+            {
+              "id": "f07960a2-28ed-4f88-a06d-eb5a8cd91ed0",
+              "name": "nama_lengkap",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.first_name }} {{ $('Telegram Trigger').item.json.message.chat.last_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8cc1f385-1943-4399-a979-100867aabf7c",
+              "name": "foto_url",
+              "value": "=https://api.telegram.org/file/bot8290217368:AAEoq-HDUrGsmXQAxVGvnFdhzS00LZHavo8/{{ $('Get a file').item.json.result.file_path }}",
+              "type": "string"
+            },
+            {
+              "id": "fcfbf397-b809-4458-a95f-75c5cfb1d255",
+              "name": "face_num",
+              "value": "={{ $('If').item.json.face_num }}",
+              "type": "string"
+            },
+            {
+              "id": "10b70990-299b-4583-b4ce-c93ab7ccb870",
+              "name": "hari",
+              "value": "={{ $json.hari }}",
+              "type": "string"
+            },
+            {
+              "id": "b274f081-89a4-4123-afe7-0fb8bb1594d2",
+              "name": "tanggal",
+              "value": "={{ $json.tanggal }}",
+              "type": "string"
+            },
+            {
+              "id": "494c355a-e513-4435-9612-33cb80b11537",
+              "name": "jam",
+              "value": "={{ $json.jam }}",
+              "type": "string"
+            },
+            {
+              "id": "2b9026ed-ac6c-4721-9e0c-edefd9b1bbc7",
+              "name": "status",
+              "value": "={{ $json.status_absen }}",
+              "type": "string"
+            },
+            {
+              "id": "34e0c2e8-f24d-4409-ac72-926fc2be8e1b",
+              "name": "balasan",
+              "value": "={{ $json.pesan_balasan }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2500,
+        -140
+      ],
+      "id": "ceb2a76e-143b-411d-8889-c3176a32c27c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Edit Fields').item.json.chat_id }}",
+        "text": "=Hai {{ $('Edit Fields').item.json.nama_lengkap }}! {{ $('Code1').item.json.pesan_balasan }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2920,
+        -140
+      ],
+      "id": "9102092d-d78e-4a88-b15d-a894412fd6ef",
+      "name": "Send a text message",
+      "webhookId": "edfb2545-cb86-4bbd-bae9-07ce9481d811",
+      "credentials": {
+        "telegramApi": {
+          "id": "exJCp5QeFaidpDVz",
+          "name": "bot absensi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "Kamu yakin itu wajah kamu? Kirim ulang foto wajahmu dengan benar.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2500,
+        200
+      ],
+      "id": "84d46b31-eb39-446b-8331-9fcffb253ff1",
+      "name": "Send a text message1",
+      "webhookId": "399eda8e-e11d-4254-95bf-dfca615b996c",
+      "credentials": {
+        "telegramApi": {
+          "id": "exJCp5QeFaidpDVz",
+          "name": "bot absensi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $json.chat_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2700,
+        -140
+      ],
+      "id": "ddd3e7d0-1796-43a7-aeff-130b8d3d87a3",
+      "name": "Send a chat action",
+      "webhookId": "7356cd92-bd6c-471b-9ccc-69d5acdb5ab4",
+      "credentials": {
+        "telegramApi": {
+          "id": "exJCp5QeFaidpDVz",
+          "name": "bot absensi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2300,
+        200
+      ],
+      "id": "b2549666-fbde-458f-8b14-13a36807d58b",
+      "name": "Send a chat action1",
+      "webhookId": "53606766-792b-4512-9ca6-6c2a70bdec1d",
+      "credentials": {
+        "telegramApi": {
+          "id": "exJCp5QeFaidpDVz",
+          "name": "bot absensi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "value": "kehadiran",
+          "mode": "list",
+          "cachedResultName": "kehadiran"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "chat_id",
+              "value": "={{ $('Edit Fields').item.json.chat_id }}"
+            },
+            {
+              "column": "username",
+              "value": "={{ $('Edit Fields').item.json.username }}"
+            },
+            {
+              "column": "nama",
+              "value": "={{ $('Edit Fields').item.json.nama_lengkap }}"
+            },
+            {
+              "column": "foto_url",
+              "value": "={{ $('Edit Fields').item.json.foto_url }}"
+            },
+            {
+              "column": "face_num",
+              "value": "={{ $('Edit Fields').item.json.face_num }}"
+            },
+            {
+              "column": "status",
+              "value": "={{ $('Edit Fields').item.json.status }}"
+            },
+            {
+              "column": "tanggal",
+              "value": "={{ $('Edit Fields').item.json.tanggal }}"
+            },
+            {
+              "column": "jam",
+              "value": "={{ $('Edit Fields').item.json.jam }}"
+            },
+            {
+              "column": "hari",
+              "value": "={{ $('Edit Fields').item.json.hari }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        3100,
+        -140
+      ],
+      "id": "d3e5fe2a-e065-428c-aa59-eebecf47d661",
+      "name": "Insert rows in a table1",
+      "credentials": {
+        "mySql": {
+          "id": "cLKdjmQfY5xrmdnG",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1080,
+        260
+      ],
+      "id": "b69f4ae3-ce52-45ef-ba73-631a6a14a609",
+      "name": "Telegram Trigger",
+      "webhookId": "1e673f3a-469a-46c6-afc0-28b9ad4bca06",
+      "credentials": {
+        "telegramApi": {
+          "id": "exJCp5QeFaidpDVz",
+          "name": "bot absensi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\n\n// Ambil hari (Indonesia)\nconst hari = now.toLocaleString('id-ID', {\n    weekday: 'long',\n    timeZone: 'Asia/Jakarta'\n});\n\n//  Tambahkan format tanggal lengkap\nconst tanggal = now.toLocaleString('id-ID', {\n    day: 'numeric',\n    month: 'long',\n    year: 'numeric',\n    timeZone: 'Asia/Jakarta'\n});\n\n\n// Ambil jam & menit WIB\nconst hour = parseInt(\n    now.toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'Asia/Jakarta' })\n);\nconst minute = parseInt(\n    now.toLocaleString('en-US', { minute: 'numeric', timeZone: 'Asia/Jakarta' })\n);\n\n// Format jam untuk pesan\nconst jamAbsen = now.toLocaleString('id-ID', {\n    hour: '2-digit',\n    minute: '2-digit',\n    timeZone: 'Asia/Jakarta'\n});\n\n// Aturan jam masuk & pulang\nlet jamMasuk = 8;\nlet batasMasuk = 30;\nlet jamPulang, batasPulang;\n\nif (['Senin', 'Selasa', 'Rabu', 'Kamis'].includes(hari)) {\n    jamPulang = 16;\n    batasPulang = 30;\n} else if (hari === 'Jumat') {\n    jamPulang = 15;\n    batasPulang = 30;\n} else {\n    jamMasuk = null;\n    jamPulang = null;\n}\n\n// Tentukan status\nlet status;\n\nif (jamMasuk === null) {\n    status = \"Libur ✅\";\n}\n// MASUK TEPAT WAKTU\nelse if (hour === jamMasuk && minute >= 0 && minute <= batasMasuk) {\n    status = \"Masuk (Tepat Waktu) ✅\";\n}\n// MASUK TERLAMBAT\nelse if (\n    (hour > jamMasuk && hour < jamPulang) ||\n    (hour === jamMasuk && minute > batasMasuk)\n) {\n    status = \"Masuk (Terlambat) ⚠️\";\n}\n// PULANG DALAM BATAS\nelse if (hour === jamPulang && minute >= 0 && minute <= batasPulang) {\n    status = \"Pulang ✅\";\n}\n// MELEWATI BATAS PULANG\nelse if (hour > jamPulang || (hour === jamPulang && minute > batasPulang)) {\n    status = \"Meninggalkan KBM ❌\";\n}\n// SEBELUM JAM MASUK\nelse if (hour < jamMasuk) {\n    status = \"Di Luar Jam Absen ❌\";\n}\nelse {\n    status = \"Di Luar Jam Absen ❌\";\n}\n\n// ✅ Tanggal dimasukkan ke output & pesan\nreturn [\n    {\n        json: {\n            // ...items[0].json,\n            hari,\n            tanggal,\n            jam: jamAbsen,\n            status_absen: status,\n            pesan_balasan:\n`Kamu berhasil Absen di Hari ${hari}, Tanggal ${tanggal}, Jam ${jamAbsen} WIB\nStatus kamu: ${status}`\n        }\n    }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        -140
+      ],
+      "id": "cbc256bf-6f12-4a69-9549-34089c75567d",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ambil lokasi user\nconst loc = $input.first().json.loc;\n\nconst userLat = $input.first().json.lat;\nconst userLon = $input.first().json.long;\n\n// Lokasi sekolah\nconst schoolLat = -7.9707741963752134;   \nconst schoolLon = 112.66836791348183;  \n\nfunction getDistMeters(lat1, lon1, lat2, lon2) {\n  const R = 6371000; // meter\n  const dLat = (lat2 - lat1) * Math.PI / 180;\n  const dLon = (lon2 - lon1) * Math.PI / 180;\n\n  const a = Math.sin(dLat/2)**2 +\n            Math.cos(lat1 * Math.PI/180) *\n            Math.cos(lat2 * Math.PI/180) *\n            Math.sin(dLon/2)**2;\n\n  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));\n}\n\nconst distanceMeters = getDistMeters(userLat, userLon, schoolLat, schoolLon);\n\n// radius 100 meter\nconst isWithin100m = distanceMeters <= 100;\n\nreturn [{\n  distance_m: Math.round(distanceMeters),\n  within_radius: isWithin100m,\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1800,
+        540
+      ],
+      "id": "5200aebb-478d-4a20-8aee-46824897490a",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "016c2c82-4755-4ea4-985c-c5d79d51f36d",
+              "leftValue": "={{ $json.message.photo[2].file_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        260
+      ],
+      "id": "d26a7c6e-7096-458b-9615-60ef93691945",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a5945820-159d-479e-abc5-10348fadab3a",
+              "leftValue": "={{ $json.within_radius }}",
+              "rightValue": null,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2000,
+        540
+      ],
+      "id": "4acd1269-1e93-433a-adeb-058e43f22664",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Edit Fields1').item.json.chat_id }}",
+        "text": "Berhasil! kamu sudah absen di area sekolah.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2280,
+        440
+      ],
+      "id": "a8b140a8-e813-40f5-a822-4a8d626b02a1",
+      "name": "Send a text message2",
+      "webhookId": "3c079050-4345-4e1f-9e9e-cfd88b5b75ee",
+      "credentials": {
+        "telegramApi": {
+          "id": "exJCp5QeFaidpDVz",
+          "name": "bot absensi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "288e4859-07aa-4848-8c97-db96be121f18",
+              "name": "chat_id",
+              "value": "={{ $json.message.from.id }}",
+              "type": "string"
+            },
+            {
+              "id": "b7b8075d-cfec-4b90-b2df-ab8202a36228",
+              "name": "loc",
+              "value": "={{ $json.message.location }}",
+              "type": "string"
+            },
+            {
+              "id": "35d3bce6-46a0-412f-bede-71ea65e93fc9",
+              "name": "lat",
+              "value": "={{ $json.message.location.latitude }}",
+              "type": "string"
+            },
+            {
+              "id": "44752644-b97c-404d-a89a-8a2d5ee62103",
+              "name": "long",
+              "value": "={{ $json.message.location.longitude }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1600,
+        540
+      ],
+      "id": "d9f25800-aa8a-48d4-8617-e4b85809c3c4",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Edit Fields1').item.json.chat_id }}",
+        "text": "Wah kamu diluar area nih, usahakan kamu absen di area sekolah ya!",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2280,
+        640
+      ],
+      "id": "67384899-4a9f-4e6c-8053-1dbe48a46483",
+      "name": "Send a text message3",
+      "webhookId": "96a4c1c6-812e-426c-8af2-60eaf974ab19",
+      "credentials": {
+        "telegramApi": {
+          "id": "exJCp5QeFaidpDVz",
+          "name": "bot absensi"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a chat action1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a chat action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a chat action": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a chat action1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table1": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message2": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8e948fd9-41bf-4444-a1ba-03df06b4f2f4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9cf6fa13cb631a12cbdab2d9e5acc91f84719091a8dd920f6a5609977d55eb50"
+  },
+  "id": "OOYUPu04PDpvgjQB",
+  "tags": []
+}
